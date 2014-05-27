@@ -1,0 +1,11 @@
+#import-file {
+	display: none;
+}
+.drop-target {
+	background: #f0f0ff;
+	border: 4px dashed transparent;
+	height: 200px;
+}
+.drop-target.drag-over {
+	border-color: #e0e0ff;
+}

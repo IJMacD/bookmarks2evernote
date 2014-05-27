@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Genex</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/genex.css">
+</head>
+<body>
+	<div class="container">
+		<h1>Genex</h1>
+		<p class="lead">Reads html bookmarks file and generates an evernote .enex file</p>
+		<input type="file" id="import-file">
+		<p><button class="btn btn-primary" id="btn-upload"><i class="glyphicon glyphicon-upload"></i> Upload</button> or drag and drop:</p>
+		<div class="drop-target"></div>
+	</div>
+<script src="js/jquery-2.1.1.min.js"></script>
+<script src="js/riot.min.js"></script>
+<script src="js/genex.js"></script>
+<script type="text/tmpl" id="tmpl-enex">
+<!DOCTYPE en-export SYSTEM "http://xml.evernote.com/pub/evernote-export.dtd">
+<en-export export-date="{created}" application="Evernote/Windows" version="4.x">
+</en-export>
+</script>
+<script type="text/tmpl" id="tmpl-enex-note">
+<note>
+	<title>{title}</title>
+	<content><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">
+	<en-note style="word-wrap: break-word; -webkit-nbsp-mode: space; -webkit-line-break: after-white-space;">
+	{title}
+	<a href="{url}">{url}</a>
+	</en-note>]]></content>
+	<created>{created}</created>
+	<tag>bookmark</tag>
+	<note-attributes>
+		<source-url>{url}</source-url>
+	</note-attributes>
+</note>
+</script>
+</body>
+</html>
