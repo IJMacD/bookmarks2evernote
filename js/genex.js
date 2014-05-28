@@ -101,14 +101,16 @@ $(function(){
 	function generateDataURL(enex){
 		var xmlSerializer = new XMLSerializer(),
 			xmlString = xmlSerializer.serializeToString(enex);
-		return "data:text/xml,"+encodeURIComponent(xmlString);
+			blob = new Blob([xmlString], {type: 'text/xml'}),
+			uri = URL.createObjectURL(blob);
+		return uri;
 	}
 	
 	function addDownloadLink(link, title){
 		if(!linkList){
 			linkList = $('<ul>').appendTo('.container');
 		}
-		var item = $('<li><a href="'+link+'" download="'+title+'">'+(title||link)+'</a>');
+		var item = $('<li><a download="'+title+'" href="'+link+'">'+(title||link)+'</a>');
 		item.find("a")[0].download = title;
 		linkList.append(item);
 	}
