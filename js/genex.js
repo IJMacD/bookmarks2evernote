@@ -75,14 +75,17 @@ $(function(){
 	function parseHTML(html){
 		var doc = $(html),
 			bookmarks = doc.find("a").map(function(i,a){
-				var $a = $(a);
-				return {url: $a.attr("href"), title: $a.text(), created: new Date($a.attr("ADD_DATE"))};
+				var $a = $(a),
+					url = $a.attr("href")
+					title = ($a.text() || url).replace(/[^a-z1-9.-_:\/\\ ]/g, ""),
+					created = ($a.attr("ADD_DATE")*1000) || Date.now();
+				return {url: url, title: title, created: formatDate(new Date(created))};
 			});
 		return bookmarks;
 	}
 	
 	function generateEnex(bookmarks){
-		var doc = $($.parseXML(riot.render(enexTemplate, {created: new Date()}))),
+		var doc = $($.parseXML(riot.render(enexTemplate, {created: formatDate(new Date())}))),
 			elem = doc.find("en-export");
 		bookmarks.each(function(i, note){
 			var fragment = riot.render(enexNoteTemplate, note);
@@ -92,11 +95,13 @@ $(function(){
 				console.log(fragment);
 			}
 		});
-		return doc[0].documentElement.outerHTML;
+		return doc[0];
 	}
 	
 	function generateDataURL(enex){
-		return "data:,"+encodeURIComponent(enex);
+		var xmlSerializer = new XMLSerializer(),
+			xmlString = xmlSerializer.serializeToString(enex);
+		return "data:text/xml,"+encodeURIComponent(xmlString);
 	}
 	
 	function addDownloadLink(link, title){
@@ -107,4 +112,22 @@ $(function(){
 		item.find("a")[0].download = title;
 		linkList.append(item);
 	}
+
+	function pad(number) {
+		var r = String(number);
+		if ( r.length === 1 ) {
+			r = '0' + r;
+		}
+		return r;
+	}
+
+	function formatDate(date){
+		return date.getUTCFullYear()
+			+ '' + pad( date.getUTCMonth() + 1 )
+			+ '' + pad( date.getUTCDate() )
+			+ 'T' + pad( date.getUTCHours() )
+			+ '' + pad( date.getUTCMinutes() )
+			+ '' + pad( date.getUTCSeconds() )
+			+ 'Z';
+    }
 });
