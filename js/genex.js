@@ -77,24 +77,30 @@ $(function(){
 			bookmarks = doc.find("a").map(function(i,a){
 				var $a = $(a),
 					url = $a.attr("href")
-					title = ($a.text() || url).replace(/[^a-z1-9.-_:\/\\ ]/g, ""),
+					title = ($a.text() || url),
+					titleFiltered = title.replace(/[^a-z1-9.-_:\/\\ ]/g, "").replace(/\s{2,}/g, " "),
 					created = ($a.attr("ADD_DATE")*1000) || Date.now();
-				return {url: url, title: title, created: formatDate(new Date(created))};
+				return {url: escapeXML(url), title: escapeXML(title), titleFiltered: titleFiltered, created: formatDate(new Date(created))};
 			});
 		return bookmarks;
 	}
 	
 	function generateEnex(bookmarks){
 		var doc = $($.parseXML(riot.render(enexTemplate, {created: formatDate(new Date())}))),
-			elem = doc.find("en-export");
+			elem = doc.find("en-export"),
+			errors = 0;
 		bookmarks.each(function(i, note){
 			var fragment = riot.render(enexNoteTemplate, note);
 			try {
 				elem.append(fragment);
 			} catch (e){
-				console.log(fragment);
+				errors++;
+				console.debug(fragment);
 			}
 		});
+		if(errors){
+			console.error("Some bookmarks were not exported. " + errors + " errors.");
+		}
 		return doc[0];
 	}
 	
@@ -132,4 +138,18 @@ $(function(){
 			+ '' + pad( date.getUTCSeconds() )
 			+ 'Z';
     }
+
+	var XML_CHAR_MAP = {
+		'<': '&lt;',
+		'>': '&gt;',
+		'&': '&amp;',
+		'"': '&quot;',
+		"'": '&apos;'
+	};
+
+	function escapeXML(string){
+		return string.replace(/[<>&"']/g, function (ch) {
+			return XML_CHAR_MAP[ch];
+		});
+	}
 });
